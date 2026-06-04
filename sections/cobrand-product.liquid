@@ -1,0 +1,237 @@
+{% comment %}
+============================================================================
+  CO-BRANDED PRODUCT SECTION — "Powered by Go-To Gifting"
+============================================================================
+  Purpose: Render a client-branded product page (e.g. Forever Rose) on the
+  Go-To Gifting Shopify store. Go-To Gifting is the SELLER OF RECORD.
+  The client is a MARKETING / AFFILIATE PARTNER only — they do not take the
+  order or capture payment. Checkout routes to the standard Go-To Gifting
+  cart/checkout, giving one unified checkout across all co-branded clients.
+
+  HOW TO CLONE PER CLIENT:
+    Every brand-specific value is exposed as a section setting (see schema at
+    bottom). Duplicate this section on a new template, change the settings,
+    assign the client's products. No code edits needed per client.
+
+  ALCOHOL COMPLIANCE HOOKS (only active when "Is alcohol product" is checked):
+    1. Age-verification gate (21+) — buyer-level; blocks add-to-cart until
+       confirmed. This is the only screening that belongs on the product page.
+    2. Seller-of-record legal line naming Go-To Gifting + license number.
+
+  DESTINATION-STATE ENFORCEMENT IS *NOT* DONE HERE — IT BELONGS AT CHECKOUT.
+  ---------------------------------------------------------------------------
+  Alcohol legality is governed by the SHIP-TO (destination) state, not the
+  buyer's location. A buyer in a restricted state may lawfully send a gift to
+  a permitted state, so the product page must NOT block by buyer location —
+  that would kill legal gift orders (the bulk of volume).
+
+  The destination must be validated at the SHIPPING step, against the
+  shipping address. On a store that ONLY sells alcohol you could just remove
+  the disallowed states from Shopify shipping zones. BUT this store also
+  sells NON-alcoholic gifts that may ship to those same states — so a
+  store-wide zone block would wrongly kill legal non-alcohol orders.
+
+  Correct pattern for this MIXED catalog: tag alcohol products and run a
+  CART-SCOPED checkout validation (Shopify Functions cart-validation /
+  checkout app) that only enforces the alcohol state list when the cart
+  CONTAINS a tagged alcohol item. Non-alcohol-only carts ship normally.
+  That logic lives at the checkout layer, not in this product section.
+
+  >> Age gate + disclosure wording + license # require attorney sign-off, as
+     does the destination state list used by the checkout-layer validation. <<
+============================================================================
+{% endcomment %}
+
+{%- liquid
+  assign client_name      = section.settings.client_name | default: 'Forever Rose'
+  assign seller_entity    = section.settings.seller_entity | default: 'Go-To Gifting LLC'
+  assign license_no       = section.settings.license_number
+  assign is_alcohol       = section.settings.is_alcohol
+  assign accent           = section.settings.accent_color
+  assign nav_color        = section.settings.nav_color
+-%}
+
+<style>
+  .cb-section {
+    --cb-accent: {{ accent }};
+    --cb-nav: {{ nav_color }};
+    --cb-ink: #2b2b2b;
+    --cb-cream: #faf6ee;
+    --cb-line: #e7e0d2;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--cb-ink);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .cb-brandbar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; padding: 22px 16px 14px; position: relative;
+  }
+  .cb-wordmark {
+    font-style: italic; font-size: 30px; letter-spacing: .5px;
+    color: var(--cb-accent); font-weight: 400;
+  }
+  .cb-wordmark sup { font-size: 11px; }
+  /* The disclosure that keeps this honest — sits next to the brand name */
+  .cb-poweredby {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 12px; line-height: 1.3; color: #6a6a6a;
+    border-left: 1px solid var(--cb-line); padding-left: 14px;
+  }
+  .cb-poweredby strong { color: var(--cb-ink); font-weight: 600; }
+  .cb-nav {
+    background: var(--cb-nav); color: #fff; text-align: center;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px; padding: 14px; letter-spacing: .3px;
+  }
+  .cb-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+    padding: 36px 24px;
+  }
+  @media (max-width: 820px){ .cb-grid{ grid-template-columns:1fr; gap:28px; } }
+  .cb-gallery img { width: 100%; border-radius: 4px; display: block; }
+  .cb-title { font-size: 30px; color: var(--cb-accent); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .5px; }
+  .cb-stars { color: #d9a400; font-size: 18px; letter-spacing: 2px; }
+  .cb-sku { color: #999; font-size: 13px; font-family: sans-serif; margin: 4px 0 18px; }
+  .cb-buybox { background: var(--cb-cream); border-radius: 8px; padding: 22px; }
+  .cb-stock { text-align: center; font-weight: 700; font-size: 17px; }
+  .cb-ship { text-align: center; color: #2e8b57; font-weight: 600; font-size: 14px; font-family: sans-serif; margin: 4px 0; }
+  .cb-price { text-align: center; font-size: 30px; font-weight: 700; border-bottom: 2px solid var(--cb-accent); padding-bottom: 12px; margin-bottom: 16px; }
+  .cb-field { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--cb-line); border-radius: 6px; background:#fff; font-family: sans-serif; font-size:15px; }
+  .cb-addcart {
+    width: 100%; padding: 18px; border: 0; border-radius: 6px;
+    background: #36a546; color: #fff; font-size: 20px; font-weight: 700;
+    cursor: pointer; font-family: sans-serif; transition: filter .15s;
+  }
+  .cb-addcart:hover { filter: brightness(.95); }
+  .cb-addcart:disabled { background: #b9b9b9; cursor: not-allowed; }
+  .cb-securenote { text-align: center; color: var(--cb-accent); font-size: 13px; font-family: sans-serif; margin-top: 12px; }
+
+  /* --- Alcohol compliance UI --- */
+  .cb-agegate {
+    border: 1px solid #d8b4b4; background: #fcf3f3; border-radius: 6px;
+    padding: 14px; margin-bottom: 14px; font-family: sans-serif; font-size: 14px;
+  }
+  .cb-agegate label { display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
+  .cb-legal {
+    font-family: sans-serif; font-size: 11px; color: #777; line-height: 1.5;
+    border-top: 1px solid var(--cb-line); margin-top: 18px; padding-top: 14px;
+  }
+</style>
+
+<div class="cb-section" data-is-alcohol="{{ is_alcohol }}">
+
+  {%- comment -%} ===== Co-brand header with disclosure ===== {%- endcomment -%}
+  <div class="cb-brandbar">
+    <span class="cb-wordmark">{{ client_name }}<sup>®</sup></span>
+    <span class="cb-poweredby">
+      powered by<br><strong>{{ seller_entity }}</strong>
+    </span>
+  </div>
+
+  <nav class="cb-nav">
+    Bundles &nbsp;·&nbsp; Gold Roses &nbsp;·&nbsp; Enchanted Rose® &nbsp;·&nbsp; Shop by Type &nbsp;·&nbsp; Shop by Occasion &nbsp;·&nbsp; Contact
+  </nav>
+
+  <div class="cb-grid">
+
+    {%- comment -%} ===== Gallery ===== {%- endcomment -%}
+    <div class="cb-gallery">
+      {%- if product.featured_image -%}
+        <img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title | escape }}">
+      {%- else -%}
+        <img src="{{ 'product-1' | placeholder_svg_tag }}" alt="Product image">
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ===== Buy box ===== {%- endcomment -%}
+    <div class="cb-buyside">
+      <h1 class="cb-title">{{ product.title | default: 'Celebration Wine Bundle' }}</h1>
+      <div class="cb-stars">★★★★★</div>
+      <div class="cb-sku">{{ product.selected_or_first_available_variant.sku | default: 'GTG-WB-01' }}</div>
+
+      <div class="cb-buybox">
+        <div class="cb-stock">In Stock, Ships Tomorrow!</div>
+        <div class="cb-ship">Get it as soon as 6/08 with Expedited Shipping</div>
+        <div class="cb-price">
+          {{ product.price | money | default: '$115.00' }}
+        </div>
+
+        {%- if is_alcohol -%}
+        {%- comment -%} ===== Age gate (buyer-level — fine on product page) ===== {%- endcomment -%}
+        <div class="cb-agegate">
+          <label>
+            <input type="checkbox" id="cb-age-confirm">
+            <span>I confirm I am 21 years of age or older. A valid government ID
+            and adult signature (21+) are required on delivery.</span>
+          </label>
+        </div>
+        {%- comment -%}
+          NO destination-state dropdown here by design. Legality keys off the
+          SHIP-TO address, which isn't known at product-page time and would
+          block legal gift orders. Destination is enforced at checkout via a
+          cart-scoped validation that fires only when the cart contains a
+          tagged alcohol item (see header comment).
+        {%- endcomment -%}
+        {%- endif -%}
+
+        {%- comment -%} ===== Client-style product options ===== {%- endcomment -%}
+        <select class="cb-field"><option>Select Your Bundle</option></select>
+        <select class="cb-field"><option>Add a Gift Message</option></select>
+
+        <button class="cb-addcart" id="cb-addcart"
+                {% if is_alcohol %}disabled{% endif %}>
+          Add to Cart
+        </button>
+        <div class="cb-securenote">Fast, Safe &amp; Secure Checkout. Satisfaction Guaranteed.</div>
+      </div>
+
+      {%- comment -%} ===== HOOK 3: Seller-of-record legal line ===== {%- endcomment -%}
+      <div class="cb-legal">
+        Sold by <strong>{{ seller_entity }}</strong>{% if license_no != blank %}, CA ABC License #{{ license_no }}{% endif %}.
+        {{ client_name }} is a marketing partner and is not the seller of record.
+        {%- if is_alcohol %} Alcohol sales are limited to eligible states and to
+        adults 21 or older; ID and adult signature required at delivery.
+        Void where prohibited.{% endif %}
+        {%- comment -%} ATTORNEY: confirm exact wording, license #, and state list. {%- endcomment -%}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{%- if is_alcohol -%}
+<script>
+  (function(){
+    // Product-page screening is age-only. Destination-state eligibility is
+    // enforced at CHECKOUT via cart-scoped validation, not here.
+    var age = document.getElementById('cb-age-confirm');
+    var btn = document.getElementById('cb-addcart');
+    function refresh(){ btn.disabled = !age.checked; }
+    age.addEventListener('change', refresh);
+    btn.addEventListener('click', function(){
+      if (btn.disabled) return;
+      // Hook into Shopify cart here, e.g. add the variant then redirect to /cart
+      window.location.href = '/cart';
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Co-Brand Product",
+  "settings": [
+    { "type": "header", "content": "Co-Branding" },
+    { "type": "text", "id": "client_name", "label": "Client brand name", "default": "Forever Rose" },
+    { "type": "text", "id": "seller_entity", "label": "Seller of record (your licensed entity)", "default": "Go-To Gifting LLC" },
+    { "type": "text", "id": "license_number", "label": "CA ABC license # (Type 21)", "info": "Confirm with attorney before publishing." },
+    { "type": "color", "id": "accent_color", "label": "Brand accent (wordmark)", "default": "#b8860b" },
+    { "type": "color", "id": "nav_color", "label": "Nav bar color", "default": "#c8102e" },
+    { "type": "header", "content": "Alcohol Compliance" },
+    { "type": "checkbox", "id": "is_alcohol", "label": "Is alcohol product", "default": false, "info": "Enables 21+ age gate and the alcohol seller-of-record disclosure. Destination-state eligibility is enforced at CHECKOUT (cart-scoped validation), not on this page." },
+    { "type": "paragraph", "content": "Ship-to state eligibility is NOT set here. Tag alcohol products and enforce the attorney-approved state list at checkout via a cart-scoped validation (Shopify Functions / checkout app) so non-alcohol gifts still ship freely." }
+  ],
+  "presets": [{ "name": "Co-Brand Product" }]
+}
+{% endschema %}
