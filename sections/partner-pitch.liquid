@@ -1,0 +1,163 @@
+{% comment %}
+============================================================================
+  PARTNER PITCH — "Become Powered by Go-To Gifting"
+============================================================================
+  B2B page selling the co-brand model to prospective client brands:
+  GTG is the licensed seller of record; the brand markets, GTG captures
+  the sale and fulfills, the brand earns an affiliate commission.
+  Steps and perks are blocks — edit/add/reorder in the theme editor.
+  Deep fulfillment/3PL detail lives at thebevconnect.com (linked).
+============================================================================
+{% endcomment %}
+
+<style>
+  .pp { font-family: var(--font-body--family, sans-serif); color: #2b2b2b; }
+  .pp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .pp-hero { background: #002850; color: #fff; text-align: center; padding: 84px 24px 72px; }
+  .pp-eyebrow { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #b48c50; margin: 0 0 12px; }
+  .pp-hero h1 { font-family: var(--font-heading--family, Georgia, serif); font-size: clamp(30px, 5vw, 52px); margin: 0 0 16px; color: #fff; }
+  .pp-hero p { font-size: 18px; line-height: 1.6; color: #dce6f2; max-width: 680px; margin: 0 auto 28px; }
+  .pp-btn { display: inline-block; background: #b48c50; color: #002850; font-weight: 700; font-size: 16px; padding: 16px 32px; border-radius: 6px; text-decoration: none; transition: filter .15s; }
+  .pp-btn:hover { filter: brightness(1.08); }
+  .pp-btn--ghost { background: transparent; color: #fff; border: 1px solid #ffffff66; margin-left: 12px; }
+  .pp-sec { padding: 64px 0; }
+  .pp-sec--alt { background: #faf6ee; }
+  .pp-h2 { font-family: var(--font-heading--family, Georgia, serif); font-size: clamp(24px, 3.5vw, 36px); color: #002850; text-align: center; margin: 0 0 40px; }
+  .pp-steps { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .pp-step .n { font-family: var(--font-heading--family, Georgia, serif); font-size: 40px; color: #b48c50; line-height: 1; margin-bottom: 10px; }
+  .pp-step h3 { font-size: 18px; color: #002850; margin: 0 0 8px; }
+  .pp-step p { font-size: 14.5px; line-height: 1.6; color: #555; margin: 0; }
+  .pp-perks { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .pp-perk { border: 1px solid #e7e0d2; border-radius: 10px; background: #fff; padding: 26px; }
+  .pp-perk h3 { font-size: 17px; color: #002850; margin: 0 0 8px; }
+  .pp-perk p { font-size: 14.5px; line-height: 1.6; color: #555; margin: 0; }
+  .pp-cta { text-align: center; padding: 72px 24px; background: #002850; color: #fff; }
+  .pp-cta h2 { font-family: var(--font-heading--family, Georgia, serif); font-size: clamp(24px, 3.5vw, 36px); color: #fff; margin: 0 0 12px; }
+  .pp-cta p { color: #dce6f2; max-width: 560px; margin: 0 auto 26px; line-height: 1.6; }
+  .pp-fineprint { font-size: 12px; color: #8aa2bd; margin-top: 22px; }
+  .pp-fineprint a { color: #b48c50; }
+</style>
+
+{%- liquid
+  assign step_count = 0
+  assign perk_count = 0
+  for block in section.blocks
+    if block.type == 'step'
+      assign step_count = step_count | plus: 1
+    elsif block.type == 'perk'
+      assign perk_count = perk_count | plus: 1
+    endif
+  endfor
+-%}
+<div class="pp">
+
+  <div class="pp-hero">
+    {%- if section.settings.eyebrow != blank -%}<p class="pp-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.subheading }}</p>
+    {%- if section.settings.cta_label != blank -%}
+      <a class="pp-btn" href="{{ section.settings.cta_link }}" {% if section.settings.cta_external %}target="_blank" rel="noopener"{% endif %}>{{ section.settings.cta_label }}</a>
+    {%- endif -%}
+    {%- if section.settings.cta2_label != blank -%}
+      <a class="pp-btn pp-btn--ghost" href="{{ section.settings.cta2_link }}">{{ section.settings.cta2_label }}</a>
+    {%- endif -%}
+  </div>
+
+  {%- if step_count > 0 -%}
+  <div class="pp-sec">
+    <div class="pp-wrap">
+      <h2 class="pp-h2">{{ section.settings.steps_heading }}</h2>
+      <div class="pp-steps">
+        {%- assign n = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+            {%- assign n = n | plus: 1 -%}
+            <div class="pp-step" {{ block.shopify_attributes }}>
+              <div class="n">{{ n | prepend: '0' | slice: -2, 2 }}</div>
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.text }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  {%- endif -%}
+
+  {%- if perk_count > 0 -%}
+  <div class="pp-sec pp-sec--alt">
+    <div class="pp-wrap">
+      <h2 class="pp-h2">{{ section.settings.perks_heading }}</h2>
+      <div class="pp-perks">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'perk' -%}
+            <div class="pp-perk" {{ block.shopify_attributes }}>
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.text }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  {%- endif -%}
+
+  {%- if section.settings.final_heading != blank -%}
+  <div class="pp-cta">
+    <h2>{{ section.settings.final_heading }}</h2>
+    <p>{{ section.settings.final_text }}</p>
+    {%- if section.settings.cta_label != blank -%}
+      <a class="pp-btn" href="{{ section.settings.cta_link }}" {% if section.settings.cta_external %}target="_blank" rel="noopener"{% endif %}>{{ section.settings.cta_label }}</a>
+    {%- endif -%}
+    {%- if section.settings.fineprint != blank -%}
+      <p class="pp-fineprint">{{ section.settings.fineprint }}</p>
+    {%- endif -%}
+  </div>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Partner Pitch",
+  "settings": [
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "For Brands" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Become powered by Go-To Gifting" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Your brand, our license. Sell wine and spirits gifts without holding a single permit — we capture the sale as the licensed seller of record, fulfill compliantly, and pay you a commission on every order." },
+    { "type": "text", "id": "cta_label", "label": "Primary CTA label", "default": "Book a discovery call" },
+    { "type": "url", "id": "cta_link", "label": "Primary CTA link" },
+    { "type": "checkbox", "id": "cta_external", "label": "Open primary CTA in new tab", "default": true },
+    { "type": "text", "id": "cta2_label", "label": "Secondary CTA label", "default": "Email us" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary CTA link" },
+    { "type": "header", "content": "Sections" },
+    { "type": "text", "id": "steps_heading", "label": "Steps heading", "default": "From \u201cwe can\u2019t sell alcohol\u201d to live in weeks" },
+    { "type": "text", "id": "perks_heading", "label": "Perks heading", "default": "What you get" },
+    { "type": "header", "content": "Final CTA" },
+    { "type": "text", "id": "final_heading", "label": "Heading", "default": "Let\u2019s get your brand selling" },
+    { "type": "textarea", "id": "final_text", "label": "Text", "default": "Tell us about your brand and your products, and we\u2019ll map the right path on a 15-minute call." },
+    { "type": "textarea", "id": "fineprint", "label": "Fine print" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Step title" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Step description." }
+      ]
+    },
+    {
+      "type": "perk",
+      "name": "Perk",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Perk title" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Perk description." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Partner Pitch" }]
+}
+{% endschema %}

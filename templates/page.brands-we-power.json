@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "main": {
+      "type": "brands-we-power",
+      "blocks": {
+        "brand_fr": {
+          "type": "brand",
+          "settings": {
+            "name": "The Forever Rose",
+            "logo_asset": "cobrand-forever-rose-logo.png",
+            "tagline": "24K gold-trimmed real roses \u2014 now with the wine and prosecco pairings their own store can\u2019t include.",
+            "link": "shopify://collections/all",
+            "cta_label": "Shop Forever Rose"
+          }
+        }
+      },
+      "block_order": [
+        "brand_fr"
+      ],
+      "settings": {
+        "eyebrow": "Our Partner Brands",
+        "heading": "Brands we power",
+        "subtext": "Every brand here trusted us to be their licensed seller of record \u2014 we capture the sale, handle compliance, and ship from our alcohol-ready warehouse, while they stay focused on their brand. Want yours on this page? See how to become powered by GTG below."
+      }
+    },
+    "cta": {
+      "type": "partner-pitch",
+      "blocks": {},
+      "block_order": [],
+      "settings": {
+        "eyebrow": "",
+        "heading": "Want your brand on this page?",
+        "subheading": "If you make a great gift but can\u2019t sell the wine or spirits to go with it, we should talk.",
+        "cta_label": "Become powered by GTG",
+        "cta_link": "/pages/become-a-partner",
+        "cta_external": false,
+        "cta2_label": "",
+        "cta2_link": "",
+        "steps_heading": "",
+        "perks_heading": "",
+        "final_heading": "",
+        "final_text": "",
+        "fineprint": ""
+      }
+    }
+  },
+  "order": [
+    "main",
+    "cta"
+  ]
+}

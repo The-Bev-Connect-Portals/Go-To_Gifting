@@ -271,7 +271,7 @@
             "b1": {
               "type": "text",
               "settings": {
-                "text": "<p><a href=\"/\">Brands we power</a><br/><a href=\"/pages/become-a-partner\">Become powered by GTG</a><br/><a href=\"/pages/contact\">Contact us</a></p>",
+                "text": "<p><a href=\"/pages/brands-we-power\">Brands we power</a><br/><a href=\"/pages/become-a-partner\">Become powered by GTG</a><br/><a href=\"/pages/contact\">Contact us</a></p>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",

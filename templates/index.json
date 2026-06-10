@@ -42,7 +42,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>From the brands you love — featuring wine, spirits, and more.</p>",
+            "text": "<p>From the brands you love \u2014 featuring wine, spirits, and more.</p>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "center",
@@ -69,7 +69,7 @@
           "name": "t:names.button",
           "settings": {
             "label": "Explore our partner brands",
-            "link": "shopify://collections/all",
+            "link": "/pages/brands-we-power",
             "open_in_new_tab": true,
             "style_class": "button-primary",
             "width": "fit-content",
@@ -126,7 +126,7 @@
           "settings": {
             "name": "The Forever Rose",
             "logo_asset": "cobrand-forever-rose-logo.png",
-            "tagline": "24K gold-trimmed real roses — now with the wine pairings their own store can’t include.",
+            "tagline": "24K gold-trimmed real roses \u2014 now with the wine pairings their own store can\u2019t include.",
             "link": "shopify://collections/forever-rose-products",
             "cta_label": "Shop Forever Rose"
           }
@@ -138,7 +138,7 @@
       "settings": {
         "eyebrow": "Our Partner Brands",
         "heading": "Brands we power",
-        "subtext": "We bring beloved brands’ gifts to your door — including wine and spirits pairings they can’t ship themselves. One trusted checkout, fully licensed and compliant."
+        "subtext": "We bring beloved brands\u2019 gifts to your door \u2014 including wine and spirits pairings they can\u2019t ship themselves. One trusted checkout, fully licensed and compliant."
       }
     },
     "product_list_fa6P9H": {
