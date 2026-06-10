@@ -54,7 +54,8 @@
     --cb-accent: {{ accent }};
     --cb-nav: {{ nav_color }};
     --cb-ink: #2b2b2b;
-    --cb-cream: #faf6ee;
+    --cb-cream: {{ section.settings.buybox_color | default: '#faf6ee' }};
+    --cb-atc: {{ section.settings.atc_color | default: '#36a546' }};
     --cb-line: #e7e0d2;
     font-family: 'Georgia', 'Times New Roman', serif;
     color: var(--cb-ink);
@@ -116,7 +117,7 @@
   .cb-qty-row input { width: 84px; padding: 12px; border: 1px solid var(--cb-line); border-radius: 6px; font-size:15px; }
   .cb-addcart {
     width: 100%; padding: 18px; border: 0; border-radius: 6px;
-    background: #36a546; color: #fff; font-size: 20px; font-weight: 700;
+    background: var(--cb-atc); color: #fff; font-size: 20px; font-weight: 700;
     cursor: pointer; font-family: sans-serif; transition: filter .15s;
   }
   .cb-addcart:hover { filter: brightness(.95); }
@@ -144,6 +145,10 @@
     {%- if section.settings.client_logo != blank -%}
       <span class="cb-logo">
         {{ section.settings.client_logo | image_url: width: 360 | image_tag: alt: client_name }}
+      </span>
+    {%- elsif section.settings.client_logo_asset != blank -%}
+      <span class="cb-logo">
+        <img src="{{ section.settings.client_logo_asset | asset_url }}" alt="{{ client_name | escape }}">
       </span>
     {%- else -%}
       <span class="cb-wordmark">{{ client_name }}<sup>&reg;</sup></span>
@@ -250,6 +255,16 @@
             <input type="hidden" name="id" value="{{ current_variant.id }}">
           {%- endif -%}
 
+          {%- if section.settings.show_engraving -%}
+            <label class="cb-label" for="cb-engrave">{{ section.settings.engraving_label }}</label>
+            <input type="text" class="cb-field" id="cb-engrave"
+                   name="properties[Engraving]" maxlength="30"
+                   placeholder="Message Here (30 Character Max)">
+            {%- if section.settings.engraving_note != blank -%}
+              <p style="font-family:sans-serif;font-size:12px;color:#777;margin:-6px 0 12px;">{{ section.settings.engraving_note }}</p>
+            {%- endif -%}
+          {%- endif -%}
+
           {%- if section.settings.show_gift_message -%}
             <label class="cb-label" for="cb-gift-msg">Gift message (optional)</label>
             <textarea class="cb-field" id="cb-gift-msg"
@@ -348,21 +363,126 @@
 {
   "name": "Co-Brand Product",
   "settings": [
-    { "type": "header", "content": "Co-Branding" },
-    { "type": "text", "id": "client_name", "label": "Client brand name", "default": "Forever Rose" },
-    { "type": "image_picker", "id": "client_logo", "label": "Client logo", "info": "Shown in place of the text wordmark when set." },
-    { "type": "text", "id": "seller_entity", "label": "Seller of record (your licensed entity)", "default": "Go-To Gifting LLC" },
-    { "type": "text", "id": "license_number", "label": "CA ABC license # (Type 21)", "info": "Confirm with attorney before publishing." },
-    { "type": "color", "id": "accent_color", "label": "Brand accent (wordmark)", "default": "#b8860b" },
-    { "type": "color", "id": "nav_color", "label": "Nav bar color", "default": "#002850" },
-    { "type": "link_list", "id": "client_menu", "label": "Client navigation menu", "info": "Build a menu per client in Online Store → Navigation, then pick it here. Hidden if unset." },
-    { "type": "header", "content": "Buy Box" },
-    { "type": "text", "id": "shipping_line", "label": "Shipping line", "default": "Ships in 1–2 business days", "info": "Keep this honest — it shows under the stock status." },
-    { "type": "checkbox", "id": "show_gift_message", "label": "Show gift message field", "default": true },
-    { "type": "header", "content": "Alcohol Compliance" },
-    { "type": "checkbox", "id": "is_alcohol", "label": "Is alcohol product", "default": false, "info": "Enables 21+ age gate and the alcohol seller-of-record disclosure. Destination-state eligibility is enforced at CHECKOUT (cart-scoped validation), not on this page." },
-    { "type": "paragraph", "content": "Ship-to state eligibility is NOT set here. Tag alcohol products and enforce the attorney-approved state list at checkout via a cart-scoped validation (Shopify Functions / checkout app) so non-alcohol gifts still ship freely." }
+    {
+      "type": "header",
+      "content": "Co-Branding"
+    },
+    {
+      "type": "text",
+      "id": "client_name",
+      "label": "Client brand name",
+      "default": "Forever Rose"
+    },
+    {
+      "type": "image_picker",
+      "id": "client_logo",
+      "label": "Client logo",
+      "info": "Shown in place of the text wordmark when set."
+    },
+    {
+      "type": "text",
+      "id": "client_logo_asset",
+      "label": "Client logo asset filename",
+      "info": "Fallback: a file in the theme's assets folder (e.g. cobrand-forever-rose-logo.png). Used when no logo image is picked above."
+    },
+    {
+      "type": "text",
+      "id": "seller_entity",
+      "label": "Seller of record (your licensed entity)",
+      "default": "Go-To Gifting LLC"
+    },
+    {
+      "type": "text",
+      "id": "license_number",
+      "label": "CA ABC license # (Type 21)",
+      "info": "Confirm with attorney before publishing."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Brand accent (wordmark)",
+      "default": "#b8860b"
+    },
+    {
+      "type": "color",
+      "id": "nav_color",
+      "label": "Nav bar color",
+      "default": "#002850"
+    },
+    {
+      "type": "link_list",
+      "id": "client_menu",
+      "label": "Client navigation menu",
+      "info": "Build a menu per client in Online Store \u2192 Navigation, then pick it here. Hidden if unset."
+    },
+    {
+      "type": "header",
+      "content": "Buy Box"
+    },
+    {
+      "type": "text",
+      "id": "shipping_line",
+      "label": "Shipping line",
+      "default": "Ships in 1\u20132 business days",
+      "info": "Keep this honest \u2014 it shows under the stock status."
+    },
+    {
+      "type": "color",
+      "id": "buybox_color",
+      "label": "Buy box background",
+      "default": "#faf6ee"
+    },
+    {
+      "type": "color",
+      "id": "atc_color",
+      "label": "Add to Cart button color",
+      "default": "#36a546"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_engraving",
+      "label": "Show engraving field",
+      "default": false,
+      "info": "Adds a 30-character personalization line (saved as an 'Engraving' property on the order). Price the engraving via a product option/variant \u2014 this field doesn't charge."
+    },
+    {
+      "type": "text",
+      "id": "engraving_label",
+      "label": "Engraving field label",
+      "default": "Hand Engrave Your Rose"
+    },
+    {
+      "type": "text",
+      "id": "engraving_note",
+      "label": "Engraving note",
+      "default": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_message",
+      "label": "Show gift message field",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Alcohol Compliance"
+    },
+    {
+      "type": "checkbox",
+      "id": "is_alcohol",
+      "label": "Is alcohol product",
+      "default": false,
+      "info": "Enables 21+ age gate and the alcohol seller-of-record disclosure. Destination-state eligibility is enforced at CHECKOUT (cart-scoped validation), not on this page."
+    },
+    {
+      "type": "paragraph",
+      "content": "Ship-to state eligibility is NOT set here. Tag alcohol products and enforce the attorney-approved state list at checkout via a cart-scoped validation (Shopify Functions / checkout app) so non-alcohol gifts still ship freely."
+    }
   ],
-  "presets": [{ "name": "Co-Brand Product" }]
+  "presets": [
+    {
+      "name": "Co-Brand Product"
+    }
+  ]
 }
 {% endschema %}
