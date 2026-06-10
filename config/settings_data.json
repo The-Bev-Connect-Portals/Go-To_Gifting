@@ -213,7 +213,7 @@
         "settings": {
           "background": "#002850",
           "foreground_heading": "#ffffff",
-          "foreground": "#e9eef5",
+          "foreground": "#ffffff",
           "primary": "#b48c50",
           "primary_hover": "#c9a86e",
           "border": "#1a4066",
