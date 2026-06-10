@@ -65,8 +65,15 @@
   .cb-brandbar {
     display: flex; align-items: center; justify-content: center;
     gap: 14px; padding: 22px 16px 14px; position: relative;
+    flex-wrap: wrap;
   }
-  .cb-logo img { max-height: 56px; width: auto; display: block; }
+  .cb-logo img { max-height: 56px; max-width: min(70vw, 320px); width: auto; height: auto; display: block; }
+  @media (max-width: 560px) {
+    .cb-brandbar { flex-direction: column; gap: 8px; padding: 16px 12px 10px; }
+    .cb-logo img { max-height: 44px; max-width: 82vw; }
+    .cb-poweredby { border-left: 0; padding-left: 0; text-align: center; }
+    .cb-poweredby br { display: none; }
+  }
   .cb-wordmark {
     font-style: italic; font-size: 30px; letter-spacing: .5px;
     color: var(--cb-accent); font-weight: 400;
