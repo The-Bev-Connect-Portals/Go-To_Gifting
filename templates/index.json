@@ -42,7 +42,7 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>From the brands you love — with the wine and spirits they can’t ship themselves.</p>",
+            "text": "<p>From the brands you love — featuring wine, spirits, and more.</p>",
             "width": "100%",
             "max_width": "normal",
             "alignment": "center",
@@ -70,7 +70,7 @@
           "settings": {
             "label": "Explore our partner brands",
             "link": "shopify://collections/all",
-            "open_in_new_tab": false,
+            "open_in_new_tab": true,
             "style_class": "button-primary",
             "width": "fit-content",
             "custom_width": 100,
