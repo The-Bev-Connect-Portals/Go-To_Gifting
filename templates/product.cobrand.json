@@ -3,14 +3,18 @@
     "main": {
       "type": "cobrand-product",
       "settings": {
-        "client_name": "Forever Rose",
+        "client_name": "Client Brand",
         "seller_entity": "Go-To Gifting LLC",
         "license_number": "",
         "accent_color": "#b48c50",
         "nav_color": "#002850",
+        "shipping_line": "Ships in 1\u20132 business days",
+        "show_gift_message": true,
         "is_alcohol": false
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "main": {
+      "type": "cobrand-product",
+      "settings": {
+        "client_name": "The Forever Rose",
+        "client_logo_asset": "cobrand-forever-rose-logo.png",
+        "seller_entity": "Go-To Gifting LLC",
+        "license_number": "",
+        "accent_color": "#b8860b",
+        "nav_color": "#1d1d1d",
+        "buybox_color": "#f5ecdd",
+        "atc_color": "#28a745",
+        "shipping_line": "Ships in 1\u20132 business days",
+        "show_engraving": true,
+        "engraving_label": "Hand Engrave Your Rose",
+        "engraving_note": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light.",
+        "show_gift_message": true,
+        "is_alcohol": false
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

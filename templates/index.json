@@ -15,13 +15,13 @@
           "type": "text",
           "name": "t:names.heading",
           "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "width": "fit-content",
+            "text": "<p>Gifts from the brands you love &mdash; with the wine and spirits they can&rsquo;t ship themselves.</p>",
+            "width": "100%",
             "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
+            "alignment": "center",
+            "type_preset": "h1",
+            "font": "var(--font-heading--family)",
+            "font_size": "3rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
@@ -41,20 +41,47 @@
           "type": "button",
           "name": "t:names.button",
           "settings": {
-            "label": "Shop all",
+            "label": "Explore our partner brands",
             "link": "shopify://collections/all",
             "open_in_new_tab": false,
-            "style_class": "button-secondary",
+            "style_class": "button-primary",
             "width": "fit-content",
             "custom_width": 100,
             "width_mobile": "fit-content",
             "custom_width_mobile": 100
           },
           "blocks": {}
+        },
+        "text_sub01": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<p>Go-To Gifting is the licensed seller behind your favorite gifting brands. Shop their signature gifts, paired and shipped compliantly to 42+ states.</p>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1.125rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground-heading)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
         }
       },
       "block_order": [
         "text_YLPk4p",
+        "text_sub01",
         "button_H9gpTf"
       ],
       "name": "t:names.hero",
@@ -72,10 +99,10 @@
         "vertical_alignment": "flex-end",
         "align_baseline": true,
         "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
+        "vertical_alignment_flex_direction_column": "center",
         "gap": 24,
         "section_width": "page-width",
-        "section_height": "medium",
+        "section_height": "large",
         "section_height_custom": 50,
         "color_scheme": "scheme-6",
         "toggle_overlay": true,
@@ -281,10 +308,34 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "brands_we_power": {
+      "type": "brands-we-power",
+      "blocks": {
+        "brand_fr": {
+          "type": "brand",
+          "settings": {
+            "name": "The Forever Rose",
+            "logo_asset": "cobrand-forever-rose-logo.png",
+            "tagline": "24K gold-trimmed real roses \u2014 now with the wine pairings their own store can\u2019t include.",
+            "link": "shopify://collections/all",
+            "cta_label": "Shop Forever Rose"
+          }
+        }
+      },
+      "block_order": [
+        "brand_fr"
+      ],
+      "settings": {
+        "eyebrow": "Our Partner Brands",
+        "heading": "Brands we power",
+        "subtext": "We bring beloved brands\u2019 gifts to your door \u2014 including wine and spirits pairings they can\u2019t ship themselves. One trusted checkout, fully licensed and compliant."
+      }
     }
   },
   "order": [
     "hero_jVaWmY",
+    "brands_we_power",
     "product_list_fa6P9H"
   ]
 }
