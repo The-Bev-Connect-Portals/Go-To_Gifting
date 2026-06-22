@@ -26,7 +26,10 @@
         "engraving_label": "Hand Engrave Your Rose",
         "engraving_note": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light.",
         "show_gift_message": true,
-        "is_alcohol": false
+        "age_gate_label": "Adult Signature Required",
+        "age_gate_hint": "Someone 21+ must sign for delivery.",
+        "age_gate_prechecked": true,
+        "is_alcohol": true
       }
     }
   },
