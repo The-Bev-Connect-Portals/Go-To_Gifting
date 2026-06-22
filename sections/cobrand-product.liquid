@@ -306,11 +306,10 @@
 
       {%- comment -%} ===== Seller-of-record legal line ===== {%- endcomment -%}
       <div class="cb-legal">
-        Sold by <strong>{{ seller_entity }}</strong>{% if license_no != blank %}, CA ABC License #{{ license_no }}{% endif %}.
-        {{ client_name }} is a marketing partner and is not the seller of record.
-        {%- if is_alcohol %} Alcohol sales are limited to eligible states and to
-        adults 21 or older; ID and adult signature required at delivery.
-        Void where prohibited.{% endif %}
+        Sold by <strong>{{ seller_entity }}</strong>, the licensed seller of record{% if license_no != blank %} (CA ABC License #{{ license_no }}){% endif %}.
+        {{ client_name }} is a marketing partner, not the seller.
+        {%- if is_alcohol %} Alcohol sold only in eligible states to adults 21+;
+        ID and adult signature required at delivery. Void where prohibited.{% endif %}
         {%- comment -%} ATTORNEY: confirm exact wording, license #, and state list. {%- endcomment -%}
       </div>
 
