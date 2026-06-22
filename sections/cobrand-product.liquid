@@ -47,6 +47,9 @@
   assign nav_color     = section.settings.nav_color
   assign client_menu   = section.settings.client_menu
   assign current_variant = product.selected_or_first_available_variant
+  assign sig_fee_handle = section.settings.adult_signature_handle | default: 'adult-signature-fee'
+  assign sig_fee_product = all_products[sig_fee_handle]
+  assign sig_fee_variant = sig_fee_product.first_available_variant | default: sig_fee_product.variants.first
 -%}
 
 <style>
@@ -141,6 +144,7 @@
   .cb-agegate__label { display:flex; gap:10px; align-items:center; cursor:pointer; }
   .cb-agegate__label input { width:18px; height:18px; margin:0; flex-shrink:0; cursor:pointer; accent-color:#1d1d1d; }
   .cb-agegate__text { font-weight:600; }
+  .cb-agegate__price { color:#777; font-weight:400; }
   .cb-agegate__hint { margin:6px 0 0 28px; font-size:12px; color:#777; line-height:1.4; }
   .cb-legal {
     font-family: sans-serif; font-size: 11px; color: #777; line-height: 1.5;
@@ -232,7 +236,7 @@
         <div class="cb-agegate">
           <label class="cb-agegate__label">
             <input type="checkbox" id="cb-age-confirm"{% if section.settings.age_gate_prechecked %} checked{% endif %}>
-            <span class="cb-agegate__text">{{ age_label }}</span>
+            <span class="cb-agegate__text">{{ age_label }}{% if section.settings.age_gate_show_price and sig_fee_variant %} <span class="cb-agegate__price">({{ sig_fee_variant.price | money }})</span>{% endif %}</span>
           </label>
           {%- if age_hint != blank -%}
             <p class="cb-agegate__hint">{{ age_hint }}</p>
@@ -336,6 +340,8 @@
     var sku    = document.querySelector('.cb-sku');
     var age    = document.getElementById('cb-age-confirm');
     var isAlc  = {{ is_alcohol | json }};
+    var sigFeeVariantId = {{ sig_fee_variant.id | default: 0 | json }};
+    var productTitle = {{ product.title | json }};
 
     function variantAvailable(){
       if (!sel) return {{ current_variant.available | json }};
@@ -347,6 +353,50 @@
       btn.disabled = !ok;
       btn.textContent = variantAvailable() ? 'Add to Cart' : 'Sold Out';
     }
+
+    // When alcohol + age confirmed, add the gift set AND the adult-signature fee
+    // together via /cart/add.js (mirrors BroBasket's bundled add), then go to cart.
+    form.addEventListener('submit', function(e){
+      if (!isAlc) return;                 // non-alcohol: native form submit, untouched
+      if (!age || !age.checked) return;   // button is disabled anyway; safety
+      if (!sigFeeVariantId) return;       // fee product not found: fall back to native add
+
+      e.preventDefault();
+      btn.disabled = true;
+
+      var giftVariantId = sel ? parseInt(sel.value, 10)
+                              : parseInt(form.querySelector('[name="id"]').value, 10);
+      var qtyEl = document.getElementById('cb-qty');
+      var qty = qtyEl ? (parseInt(qtyEl.value, 10) || 1) : 1;
+
+      // Carry the engraving / gift-message line-item properties onto the gift set
+      var props = {};
+      var eng = document.getElementById('cb-engrave');
+      if (eng && eng.value) props['Engraving'] = eng.value;
+      var gm = document.getElementById('cb-gift-msg');
+      if (gm && gm.value) props['Gift Message'] = gm.value;
+      props['_Client'] = {{ client_name | json }};
+
+      var items = [
+        { id: giftVariantId, quantity: qty, properties: props },
+        { id: sigFeeVariantId, quantity: qty, properties: { 'For': productTitle } }
+      ];
+
+      fetch((window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items })
+      })
+      .then(function(r){
+        if (!r.ok) throw new Error('add failed');
+        window.location.href = (window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart';
+      })
+      .catch(function(){
+        // Fallback: submit the native form so the gift set still adds
+        btn.disabled = false;
+        form.submit();
+      });
+    });
     if (sel) sel.addEventListener('change', function(){
       var opt = sel.options[sel.selectedIndex];
       if (price) price.innerHTML = opt.dataset.price + (opt.dataset.compare ? ' <s>' + opt.dataset.compare + '</s>' : '');
@@ -500,6 +550,20 @@
       "label": "Pre-check age confirmation",
       "default": true,
       "info": "Matches BroBasket's preselected behavior. NOTE: a pre-checked alcohol attestation is worth attorney review."
+    },
+    {
+      "type": "text",
+      "id": "adult_signature_handle",
+      "label": "Adult signature fee product handle",
+      "default": "adult-signature-fee",
+      "info": "Handle of the fee product added to cart with the gift set. Must be published to Online Store."
+    },
+    {
+      "type": "checkbox",
+      "id": "age_gate_show_price",
+      "label": "Show fee price on label",
+      "default": true,
+      "info": "Displays the live fee amount next to the label, e.g. ($6.99)."
     },
     {
       "type": "checkbox",
