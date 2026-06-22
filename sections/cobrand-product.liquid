@@ -138,7 +138,10 @@
     border: 1px solid #d8b4b4; background: #fcf3f3; border-radius: 6px;
     padding: 14px; margin-bottom: 14px; font-family: sans-serif; font-size: 14px;
   }
-  .cb-agegate label { display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
+  .cb-agegate__label { display:flex; gap:10px; align-items:center; cursor:pointer; }
+  .cb-agegate__label input { width:18px; height:18px; margin:0; flex-shrink:0; cursor:pointer; accent-color:#1d1d1d; }
+  .cb-agegate__text { font-weight:600; }
+  .cb-agegate__hint { margin:6px 0 0 28px; font-size:12px; color:#777; line-height:1.4; }
   .cb-legal {
     font-family: sans-serif; font-size: 11px; color: #777; line-height: 1.5;
     border-top: 1px solid var(--cb-line); margin-top: 18px; padding-top: 14px;
@@ -224,12 +227,16 @@
 
         {%- if is_alcohol -%}
         {%- comment -%} ===== Age gate (buyer-level — fine on product page) ===== {%- endcomment -%}
+        {%- assign age_label = section.settings.age_gate_label | default: 'Adult Signature Required' -%}
+        {%- assign age_hint  = section.settings.age_gate_hint  | default: 'Someone 21+ must sign for delivery.' -%}
         <div class="cb-agegate">
-          <label>
-            <input type="checkbox" id="cb-age-confirm">
-            <span>I confirm I am 21 years of age or older. A valid government ID
-            and adult signature (21+) are required on delivery.</span>
+          <label class="cb-agegate__label">
+            <input type="checkbox" id="cb-age-confirm"{% if section.settings.age_gate_prechecked %} checked{% endif %}>
+            <span class="cb-agegate__text">{{ age_label }}</span>
           </label>
+          {%- if age_hint != blank -%}
+            <p class="cb-agegate__hint">{{ age_hint }}</p>
+          {%- endif -%}
         </div>
         {%- comment -%}
           NO destination-state dropdown here by design — see header comment.
@@ -473,6 +480,27 @@
     {
       "type": "header",
       "content": "Alcohol Compliance"
+    },
+    {
+      "type": "text",
+      "id": "age_gate_label",
+      "label": "Age gate label",
+      "default": "Adult Signature Required",
+      "info": "Bold checkbox label shown when 'Is alcohol product' is on."
+    },
+    {
+      "type": "text",
+      "id": "age_gate_hint",
+      "label": "Age gate hint",
+      "default": "Someone 21+ must sign for delivery.",
+      "info": "Lighter helper line under the label. Leave blank to hide."
+    },
+    {
+      "type": "checkbox",
+      "id": "age_gate_prechecked",
+      "label": "Pre-check age confirmation",
+      "default": true,
+      "info": "Matches BroBasket's preselected behavior. NOTE: a pre-checked alcohol attestation is worth attorney review."
     },
     {
       "type": "checkbox",
