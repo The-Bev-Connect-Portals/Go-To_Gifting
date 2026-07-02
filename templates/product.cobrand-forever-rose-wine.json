@@ -24,12 +24,16 @@
         "atc_color": "#28a745",
         "show_engraving": true,
         "engraving_label": "Hand Engrave Your Rose",
-        "engraving_note": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light.",
+        "engraving_note": "Gold fill engraving. Engraved items are not returnable. Engraving is done by hand in all caps.",
         "show_gift_message": true,
         "age_gate_label": "Adult Signature Required",
         "age_gate_hint": "Someone 21+ must sign for delivery.",
         "age_gate_prechecked": true,
-        "is_alcohol": true
+        "is_alcohol": true,
+        "engraving_paid": true,
+        "engraving_paid_label": "Add Gold Fill Engraving",
+        "engraving_fee_handle": "gold-fill-engraving",
+        "engraving_paid_prechecked": false
       }
     }
   },

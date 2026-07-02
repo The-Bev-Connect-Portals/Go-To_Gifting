@@ -50,6 +50,9 @@
   assign sig_fee_handle = section.settings.adult_signature_handle | default: 'adult-signature-fee'
   assign sig_fee_product = all_products[sig_fee_handle]
   assign sig_fee_variant = sig_fee_product.first_available_variant | default: sig_fee_product.variants.first
+  assign engrave_fee_handle = section.settings.engraving_fee_handle | default: 'gold-fill-engraving'
+  assign engrave_fee_product = all_products[engrave_fee_handle]
+  assign engrave_fee_variant = engrave_fee_product.first_available_variant | default: engrave_fee_product.variants.first
 -%}
 
 <style>
@@ -123,6 +126,11 @@
   .cb-label { display:block; font-family: sans-serif; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
   .cb-field { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--cb-line); border-radius: 6px; background:#fff; font-family: sans-serif; font-size:15px; box-sizing: border-box; }
   textarea.cb-field { resize: vertical; min-height: 70px; }
+  .cb-engrave-opt { margin-bottom: 10px; }
+  .cb-engrave-check { display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-family:sans-serif; font-size:14px; font-weight:600; line-height:1.35; }
+  .cb-engrave-check input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex:0 0 auto; accent-color: var(--cb-accent); cursor:pointer; }
+  .cb-engrave-check__price { color: var(--cb-accent); font-weight:700; white-space:nowrap; }
+  .cb-engrave-field { }
   .cb-qty-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; font-family:sans-serif; }
   .cb-qty-row input { width: 84px; padding: 12px; border: 1px solid var(--cb-line); border-radius: 6px; font-size:15px; }
   .cb-addcart {
@@ -274,12 +282,31 @@
           {%- endif -%}
 
           {%- if section.settings.show_engraving -%}
-            <label class="cb-label" for="cb-engrave">{{ section.settings.engraving_label }}</label>
-            <input type="text" class="cb-field" id="cb-engrave"
-                   name="properties[Engraving]" maxlength="30"
-                   placeholder="Message Here (30 Character Max)">
-            {%- if section.settings.engraving_note != blank -%}
-              <p style="font-family:sans-serif;font-size:12px;color:#777;margin:-6px 0 12px;">{{ section.settings.engraving_note }}</p>
+            {%- if section.settings.engraving_paid and engrave_fee_variant -%}
+              {%- assign engrave_label = section.settings.engraving_paid_label | default: section.settings.engraving_label -%}
+              <div class="cb-engrave-opt">
+                <label class="cb-engrave-check">
+                  <input type="checkbox" id="cb-engrave-toggle"
+                         {% if section.settings.engraving_paid_prechecked %}checked{% endif %}>
+                  <span class="cb-engrave-check__text">{{ engrave_label }} <span class="cb-engrave-check__price">(+{{ engrave_fee_variant.price | money }})</span></span>
+                </label>
+              </div>
+              <div id="cb-engrave-field" class="cb-engrave-field"{% unless section.settings.engraving_paid_prechecked %} style="display:none"{% endunless %}>
+                <input type="text" class="cb-field" id="cb-engrave"
+                       name="properties[Engraving]" maxlength="30"
+                       placeholder="Message Here (30 Character Max)">
+                {%- if section.settings.engraving_note != blank -%}
+                  <p style="font-family:sans-serif;font-size:12px;color:#777;margin:-6px 0 12px;">{{ section.settings.engraving_note }}</p>
+                {%- endif -%}
+              </div>
+            {%- else -%}
+              <label class="cb-label" for="cb-engrave">{{ section.settings.engraving_label }}</label>
+              <input type="text" class="cb-field" id="cb-engrave"
+                     name="properties[Engraving]" maxlength="30"
+                     placeholder="Message Here (30 Character Max)">
+              {%- if section.settings.engraving_note != blank -%}
+                <p style="font-family:sans-serif;font-size:12px;color:#777;margin:-6px 0 12px;">{{ section.settings.engraving_note }}</p>
+              {%- endif -%}
             {%- endif -%}
           {%- endif -%}
 
@@ -341,7 +368,21 @@
     var age    = document.getElementById('cb-age-confirm');
     var isAlc  = {{ is_alcohol | json }};
     var sigFeeVariantId = {{ sig_fee_variant.id | default: 0 | json }};
+    var engFeeVariantId = {{ engrave_fee_variant.id | default: 0 | json }};
     var productTitle = {{ product.title | json }};
+
+    // Paid gold-fill engraving: checkbox toggles the message field and the fee.
+    var engToggle = document.getElementById('cb-engrave-toggle');
+    var engField  = document.getElementById('cb-engrave-field');
+    if (engToggle && engField) {
+      engToggle.addEventListener('change', function(){
+        engField.style.display = engToggle.checked ? '' : 'none';
+      });
+    }
+    function engravingSelected(){
+      // Paid engraving is chosen only when the toggle exists AND is checked.
+      return !!(engToggle && engToggle.checked && engFeeVariantId);
+    }
 
     function variantAvailable(){
       if (!sel) return {{ current_variant.available | json }};
@@ -354,12 +395,13 @@
       btn.textContent = variantAvailable() ? 'Add to Cart' : 'Sold Out';
     }
 
-    // When alcohol + age confirmed, add the gift set AND the adult-signature fee
-    // together via /cart/add.js (mirrors BroBasket's bundled add), then go to cart.
+    // Bundle the gift set with any fees (adult-signature and/or gold-fill engraving)
+    // via /cart/add.js, then go to cart. Runs for alcohol (age-gated) and also for
+    // non-alcohol products whenever a paid engraving is selected.
     form.addEventListener('submit', function(e){
-      if (!isAlc) return;                 // non-alcohol: native form submit, untouched
-      if (!age || !age.checked) return;   // button is disabled anyway; safety
-      if (!sigFeeVariantId) return;       // fee product not found: fall back to native add
+      var needsBundle = (isAlc && sigFeeVariantId) || engravingSelected();
+      if (!needsBundle) return;           // nothing to bundle: native form submit, untouched
+      if (isAlc && (!age || !age.checked)) return;  // button disabled anyway; safety
 
       e.preventDefault();
       btn.disabled = true;
@@ -372,15 +414,22 @@
       // Carry the engraving / gift-message line-item properties onto the gift set
       var props = {};
       var eng = document.getElementById('cb-engrave');
-      if (eng && eng.value) props['Engraving'] = eng.value;
+      if (engravingSelected() && eng && eng.value) props['Engraving'] = eng.value;
       var gm = document.getElementById('cb-gift-msg');
       if (gm && gm.value) props['Gift Message'] = gm.value;
       props['_Client'] = {{ client_name | json }};
 
       var items = [
-        { id: giftVariantId, quantity: qty, properties: props },
-        { id: sigFeeVariantId, quantity: qty, properties: { 'For': productTitle } }
+        { id: giftVariantId, quantity: qty, properties: props }
       ];
+      if (isAlc && sigFeeVariantId) {
+        items.push({ id: sigFeeVariantId, quantity: qty, properties: { 'For': productTitle } });
+      }
+      if (engravingSelected()) {
+        var engProps = { 'For': productTitle };
+        if (eng && eng.value) engProps['Engraving'] = eng.value;
+        items.push({ id: engFeeVariantId, quantity: qty, properties: engProps });
+      }
 
       fetch((window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart/add.js', {
         method: 'POST',
@@ -519,6 +568,34 @@
       "id": "engraving_note",
       "label": "Engraving note",
       "default": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light."
+    },
+    {
+      "type": "checkbox",
+      "id": "engraving_paid",
+      "label": "Charge for engraving (paid add-on)",
+      "default": false,
+      "info": "Turns the engraving into an optional paid checkbox. Adds the fee product below to the cart when checked, and shows the message field only once selected. Requires the fee product to be published to Online Store."
+    },
+    {
+      "type": "text",
+      "id": "engraving_paid_label",
+      "label": "Paid engraving checkbox label",
+      "default": "Add Gold Fill Engraving",
+      "info": "Price is appended automatically, e.g. (+$35.00). Leave blank to reuse the field label above."
+    },
+    {
+      "type": "text",
+      "id": "engraving_fee_handle",
+      "label": "Engraving fee product handle",
+      "default": "gold-fill-engraving",
+      "info": "Handle of the fee product added to cart when engraving is selected. Must be published to Online Store."
+    },
+    {
+      "type": "checkbox",
+      "id": "engraving_paid_prechecked",
+      "label": "Pre-check paid engraving",
+      "default": false,
+      "info": "If on, the engraving box is checked by default and the message field is shown. Off = customer opts in."
     },
     {
       "type": "checkbox",
