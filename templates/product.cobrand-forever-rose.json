@@ -20,12 +20,16 @@
         "nav_color": "#1d1d1d",
         "buybox_color": "#f5ecdd",
         "atc_color": "#28a745",
-        "shipping_line": "Ships in 1\u20132 business days",
+        "shipping_line": "Ships in 1–2 business days",
         "show_engraving": true,
         "engraving_label": "Hand Engrave Your Rose",
-        "engraving_note": "Engraved items are not returnable. Engraving is done by hand in all caps; it is very light.",
+        "engraving_note": "Gold fill engraving. Engraved items are not returnable. Engraving is done by hand in all caps.",
         "show_gift_message": true,
-        "is_alcohol": false
+        "is_alcohol": false,
+        "engraving_paid": true,
+        "engraving_paid_label": "Add Gold Fill Engraving",
+        "engraving_fee_handle": "gold-fill-engraving",
+        "engraving_paid_prechecked": false
       }
     }
   },
