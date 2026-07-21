@@ -36,7 +36,8 @@
         "engraving_paid_prechecked": false,
         "show_free_shipping": true,
         "free_shipping_text": "Free Shipping",
-        "age_gate_charge": false
+        "age_gate_charge": false,
+        "engraving_image": "https://cdn.shopify.com/s/files/1/0635/0123/8491/files/rn-image_picker_lib_temp_dd8a7781-d61f-4a02-970c-6370aa5f8dc4.png?v=1784661390"
       }
     }
   },
