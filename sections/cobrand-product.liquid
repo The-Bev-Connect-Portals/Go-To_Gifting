@@ -121,6 +121,8 @@
   .cb-stock { text-align: center; font-weight: 700; font-size: 17px; }
   .cb-stock.is-out { color: #a33; }
   .cb-ship { text-align: center; color: #2e8b57; font-weight: 600; font-size: 14px; font-family: sans-serif; margin: 4px 0; }
+  .cb-freeship { text-align:center; color:#2e8b57; font-weight:700; font-size:14px; font-family:sans-serif; margin:4px 0; letter-spacing:.02em; }
+  .cb-freeship::before { content:"\2713  "; }
   .cb-price { text-align: center; font-size: 30px; font-weight: 700; border-bottom: 2px solid var(--cb-accent); padding-bottom: 12px; margin-bottom: 16px; }
   .cb-price s { color:#999; font-size: 20px; font-weight: 400; margin-left: 8px; }
   .cb-label { display:block; font-family: sans-serif; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
@@ -130,6 +132,9 @@
   .cb-engrave-check { display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-family:sans-serif; font-size:14px; font-weight:600; line-height:1.35; }
   .cb-engrave-check input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex:0 0 auto; accent-color: var(--cb-accent); cursor:pointer; }
   .cb-engrave-check__price { color: var(--cb-accent); font-weight:700; white-space:nowrap; }
+  .cb-engrave-info { margin:8px 0 4px; display:flex; gap:12px; align-items:flex-start; }
+  .cb-engrave-img { width:96px; height:96px; object-fit:cover; border-radius:6px; border:1px solid var(--cb-line); flex:0 0 auto; }
+  .cb-engrave-desc { margin:0; font-family:sans-serif; font-size:13px; line-height:1.45; color:#555; }
   .cb-engrave-field { }
   .cb-qty-row { display:flex; gap:12px; align-items:center; margin-bottom:12px; font-family:sans-serif; }
   .cb-qty-row input { width: 84px; padding: 12px; border: 1px solid var(--cb-line); border-radius: 6px; font-size:15px; }
@@ -230,6 +235,9 @@
         {%- if section.settings.shipping_line != blank -%}
           <div class="cb-ship">{{ section.settings.shipping_line }}</div>
         {%- endif -%}
+        {%- if section.settings.show_free_shipping -%}
+          <div class="cb-freeship">{{ section.settings.free_shipping_text | default: 'Free Shipping' }}</div>
+        {%- endif -%}
         <div class="cb-price" id="cb-price">
           {{ current_variant.price | money }}
           {%- if current_variant.compare_at_price > current_variant.price -%}
@@ -244,7 +252,7 @@
         <div class="cb-agegate">
           <label class="cb-agegate__label">
             <input type="checkbox" id="cb-age-confirm"{% if section.settings.age_gate_prechecked %} checked{% endif %}>
-            <span class="cb-agegate__text">{{ age_label }}{% if section.settings.age_gate_show_price and sig_fee_variant %} <span class="cb-agegate__price">({{ sig_fee_variant.price | money }})</span>{% endif %}</span>
+            <span class="cb-agegate__text">{{ age_label }}</span>
           </label>
           {%- if age_hint != blank -%}
             <p class="cb-agegate__hint">{{ age_hint }}</p>
@@ -290,6 +298,16 @@
                          {% if section.settings.engraving_paid_prechecked %}checked{% endif %}>
                   <span class="cb-engrave-check__text">{{ engrave_label }} <span class="cb-engrave-check__price">(+{{ engrave_fee_variant.price | money }})</span></span>
                 </label>
+                {%- if section.settings.engraving_explanation != blank or section.settings.engraving_image != blank -%}
+                  <div class="cb-engrave-info">
+                    {%- if section.settings.engraving_image != blank -%}
+                      <img class="cb-engrave-img" src="{{ section.settings.engraving_image }}" alt="Example of gold fill engraving" loading="lazy">
+                    {%- endif -%}
+                    {%- if section.settings.engraving_explanation != blank -%}
+                      <p class="cb-engrave-desc">{{ section.settings.engraving_explanation }}</p>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
               </div>
               <div id="cb-engrave-field" class="cb-engrave-field"{% unless section.settings.engraving_paid_prechecked %} style="display:none"{% endunless %}>
                 <input type="text" class="cb-field" id="cb-engrave"
@@ -311,7 +329,7 @@
           {%- endif -%}
 
           {%- if section.settings.show_gift_message -%}
-            <label class="cb-label" for="cb-gift-msg">Gift message (optional)</label>
+            <label class="cb-label" for="cb-gift-msg">Add A Free Gift Message</label>
             <textarea class="cb-field" id="cb-gift-msg"
                       name="properties[Gift Message]" maxlength="300"
                       placeholder="Write a note to go with this gift&hellip;"></textarea>
@@ -368,6 +386,7 @@
     var age    = document.getElementById('cb-age-confirm');
     var isAlc  = {{ is_alcohol | json }};
     var sigFeeVariantId = {{ sig_fee_variant.id | default: 0 | json }};
+    var chargeSignature = {{ section.settings.age_gate_charge | default: false | json }};
     var engFeeVariantId = {{ engrave_fee_variant.id | default: 0 | json }};
     var productTitle = {{ product.title | json }};
 
@@ -399,7 +418,7 @@
     // via /cart/add.js, then go to cart. Runs for alcohol (age-gated) and also for
     // non-alcohol products whenever a paid engraving is selected.
     form.addEventListener('submit', function(e){
-      var needsBundle = (isAlc && sigFeeVariantId) || engravingSelected();
+      var needsBundle = (isAlc && chargeSignature && sigFeeVariantId) || engravingSelected();
       if (!needsBundle) return;           // nothing to bundle: native form submit, untouched
       if (isAlc && (!age || !age.checked)) return;  // button disabled anyway; safety
 
@@ -422,7 +441,7 @@
       var items = [
         { id: giftVariantId, quantity: qty, properties: props }
       ];
-      if (isAlc && sigFeeVariantId) {
+      if (isAlc && chargeSignature && sigFeeVariantId) {
         items.push({ id: sigFeeVariantId, quantity: qty, properties: { 'For': productTitle } });
       }
       if (engravingSelected()) {
@@ -539,6 +558,19 @@
       "info": "Keep this honest \u2014 it shows under the stock status."
     },
     {
+      "type": "checkbox",
+      "id": "show_free_shipping",
+      "label": "Show Free Shipping line",
+      "default": false,
+      "info": "Shows a Free Shipping line in the buy box. Only turn on if this product actually ships free \u2014 set the rate to $0 in Shopify Settings \u2192 Shipping for the matching profile."
+    },
+    {
+      "type": "text",
+      "id": "free_shipping_text",
+      "label": "Free shipping text",
+      "default": "Free Shipping"
+    },
+    {
       "type": "color",
       "id": "buybox_color",
       "label": "Buy box background",
@@ -580,8 +612,21 @@
       "type": "text",
       "id": "engraving_paid_label",
       "label": "Paid engraving checkbox label",
-      "default": "Add Gold Fill Engraving",
+      "default": "Engrave The Wine Bottle with Gold Fill Engraving",
       "info": "Price is appended automatically, e.g. (+$35.00). Leave blank to reuse the field label above."
+    },
+    {
+      "type": "textarea",
+      "id": "engraving_explanation",
+      "label": "Engraving explanation",
+      "default": "Gold fill engraving is hand-etched into the bottle and filled with gold for a raised, shimmering finish that makes your message stand out. Each piece is done by hand, so every one is unique.",
+      "info": "Shown under the engraving checkbox to explain what gold fill looks like."
+    },
+    {
+      "type": "text",
+      "id": "engraving_image",
+      "label": "Engraving example image URL",
+      "info": "Paste an image URL showing a gold-fill engraving example. Upload the image in Content \u2192 Files, copy its URL, and paste it here."
     },
     {
       "type": "text",
@@ -637,10 +682,10 @@
     },
     {
       "type": "checkbox",
-      "id": "age_gate_show_price",
-      "label": "Show fee price on label",
-      "default": true,
-      "info": "Displays the live fee amount next to the label, e.g. ($6.99)."
+      "id": "age_gate_charge",
+      "label": "Charge adult signature fee",
+      "default": false,
+      "info": "OFF = all-in pricing, no separate signature fee added to cart (checkbox is just a confirmation). ON = adds the signature fee product above to the cart."
     },
     {
       "type": "checkbox",

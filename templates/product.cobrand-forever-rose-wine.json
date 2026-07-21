@@ -26,14 +26,17 @@
         "engraving_label": "Hand Engrave Your Rose",
         "engraving_note": "Gold fill engraving. Engraved items are not returnable. Engraving is done by hand in all caps.",
         "show_gift_message": true,
-        "age_gate_label": "Adult Signature Required",
+        "age_gate_label": "Adult Signature Required!",
         "age_gate_hint": "Someone 21+ must sign for delivery.",
         "age_gate_prechecked": true,
         "is_alcohol": true,
         "engraving_paid": true,
-        "engraving_paid_label": "Add Gold Fill Engraving",
+        "engraving_paid_label": "Engrave The Wine Bottle with Gold Fill Engraving",
         "engraving_fee_handle": "gold-fill-engraving",
-        "engraving_paid_prechecked": false
+        "engraving_paid_prechecked": false,
+        "show_free_shipping": true,
+        "free_shipping_text": "Free Shipping",
+        "age_gate_charge": false
       }
     }
   },

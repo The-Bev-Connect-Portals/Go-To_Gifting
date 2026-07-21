@@ -27,9 +27,12 @@
         "show_gift_message": true,
         "is_alcohol": false,
         "engraving_paid": true,
-        "engraving_paid_label": "Add Gold Fill Engraving",
+        "engraving_paid_label": "Engrave The Rose with Gold Fill Engraving",
         "engraving_fee_handle": "gold-fill-engraving",
-        "engraving_paid_prechecked": false
+        "engraving_paid_prechecked": false,
+        "show_free_shipping": true,
+        "free_shipping_text": "Free Shipping",
+        "age_gate_charge": false
       }
     }
   },
