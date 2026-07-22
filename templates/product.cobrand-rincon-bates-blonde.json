@@ -1,0 +1,39 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "cobrand-product",
+      "settings": {
+        "client_name": "Rincon Brewery",
+        "client_logo_asset": "",
+        "seller_entity": "Go-To Gifting LLC",
+        "license_number": "",
+        "accent_color": "#0E3A46",
+        "nav_color": "#0a2c35",
+        "buybox_color": "#F7F4EC",
+        "atc_color": "#E7A130",
+        "shipping_line": "Cold-packed \u00b7 Ships in 1\u20132 business days",
+        "show_free_shipping": false,
+        "show_engraving": false,
+        "show_gift_message": true,
+        "age_gate_label": "Adult Signature Required",
+        "age_gate_hint": "Someone 21+ must sign for delivery.",
+        "age_gate_prechecked": true,
+        "age_gate_charge": false,
+        "is_alcohol": true,
+        "alcohol_disclosure": "Must be 21+ with a valid ID and adult signature at delivery."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
