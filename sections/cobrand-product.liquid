@@ -149,6 +149,21 @@
   .cb-desc { padding: 0 24px 36px; font-size: 16px; line-height: 1.7; max-width: 820px; }
   .cb-desc h2 { color: var(--cb-accent); font-size: 22px; }
 
+  /* --- Spec strip (optional; shown when product has spec metafields) --- */
+  .cb-specs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--cb-line); border-radius: 8px; overflow: hidden;
+    margin: 22px 0 4px; font-family: -apple-system, 'Segoe UI', sans-serif;
+  }
+  .cb-specs > div { padding: 14px; border-right: 1px solid var(--cb-line); }
+  .cb-specs > div:last-child { border-right: 0; }
+  .cb-specs .cb-spec-k {
+    display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--cb-accent); font-weight: 700; margin-bottom: 4px;
+  }
+  .cb-specs .cb-spec-v { font-size: 13.5px; color: var(--cb-ink); line-height: 1.4; }
+  @media (max-width: 640px){ .cb-specs { grid-template-columns: 1fr 1fr; } }
+
   /* --- Alcohol compliance UI --- */
   .cb-agegate {
     border: 1px solid #d8b4b4; background: #fcf3f3; border-radius: 6px;
@@ -357,13 +372,37 @@
       <div class="cb-legal">
         Sold by <strong>{{ seller_entity }}</strong>, the licensed seller of record{% if license_no != blank %} (CA ABC License #{{ license_no }}){% endif %}.
         {{ client_name }} is a marketing partner, not the seller.
-        {%- if is_alcohol %} Alcohol sold only in eligible states to adults 21+;
-        ID and adult signature required at delivery. Void where prohibited.{% endif %}
-        {%- comment -%} ATTORNEY: confirm exact wording, license #, and state list. {%- endcomment -%}
+        {%- if is_alcohol -%}
+          {%- if section.settings.alcohol_disclosure != blank %} {{ section.settings.alcohol_disclosure }}
+          {%- else %} Must be 21+ with a valid ID and adult signature at delivery.{% endif -%}
+        {%- endif -%}
       </div>
 
     </div>
   </div>
+
+  {%- comment -%}
+    ===== Optional spec strip =====
+    Renders only when the product has one or more spec metafields under the
+    `custom` namespace. Each cell appears only if its value is present, so a
+    beer with no ABV simply omits that cell, and products with no spec
+    metafields at all (e.g. Forever Rose) render nothing here.
+    Metafields: custom.style, custom.abv, custom.format, custom.tasting_notes
+  {%- endcomment -%}
+  {%- assign m_style = product.metafields.custom.style -%}
+  {%- assign m_abv   = product.metafields.custom.abv -%}
+  {%- assign m_fmt   = product.metafields.custom.format -%}
+  {%- assign m_notes = product.metafields.custom.tasting_notes -%}
+  {%- if m_style != blank or m_abv != blank or m_fmt != blank or m_notes != blank -%}
+    <div class="cb-desc" style="padding-bottom:0">
+      <div class="cb-specs">
+        {%- if m_style != blank -%}<div><span class="cb-spec-k">Style</span><span class="cb-spec-v">{{ m_style }}</span></div>{%- endif -%}
+        {%- if m_abv != blank -%}<div><span class="cb-spec-k">ABV</span><span class="cb-spec-v">{{ m_abv }}</span></div>{%- endif -%}
+        {%- if m_fmt != blank -%}<div><span class="cb-spec-k">Format</span><span class="cb-spec-v">{{ m_fmt }}</span></div>{%- endif -%}
+        {%- if m_notes != blank -%}<div><span class="cb-spec-k">Tasting Notes</span><span class="cb-spec-v">{{ m_notes }}</span></div>{%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
 
   {%- if product.description != blank -%}
     <div class="cb-desc">
@@ -692,11 +731,17 @@
       "id": "is_alcohol",
       "label": "Is alcohol product",
       "default": false,
-      "info": "Enables 21+ age gate and the alcohol seller-of-record disclosure. Destination-state eligibility is enforced at CHECKOUT (cart-scoped validation), not on this page."
+      "info": "Enables 21+ age gate and the alcohol seller-of-record disclosure. Ship-to eligibility is controlled by your Shopify shipping zones."
+    },
+    {
+      "type": "text",
+      "id": "alcohol_disclosure",
+      "label": "Alcohol disclosure line",
+      "info": "Shown on the seller-of-record legal line for alcohol products. Leave blank to use the default (21+ / ID / adult signature)."
     },
     {
       "type": "paragraph",
-      "content": "Ship-to state eligibility is NOT set here. Tag alcohol products and enforce the attorney-approved state list at checkout via a cart-scoped validation (Shopify Functions / checkout app) so non-alcohol gifts still ship freely."
+      "content": "Ship-to eligibility is controlled by your Shopify shipping zones (Settings \u2192 Shipping). This page does not block by state."
     }
   ],
   "presets": [

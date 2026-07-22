@@ -1,0 +1,138 @@
+{% comment %}
+============================================================================
+  CO-BRANDED COLLECTION HEADER — "Powered by Go-To Gifting"
+============================================================================
+  A client-branded band that sits ABOVE the standard product grid on a
+  collection page, giving the collection the client's identity (logo/wordmark,
+  colors, nav, tagline) plus the honest "powered by <seller>" disclosure.
+
+  Go-To Gifting is the SELLER OF RECORD; the client is a marketing partner.
+  This is the collection-page companion to `cobrand-product.liquid` and uses
+  the same settings-driven, no-code-per-client pattern.
+
+  HOW TO CLONE PER CLIENT:
+    1. Duplicate templates/collection.json as
+       templates/collection.cobrand-<client>.json
+    2. Add this section above "main", set its settings (name, logo, colors).
+    3. In Shopify Admin, assign the client's collection to that template.
+============================================================================
+{% endcomment %}
+
+{%- liquid
+  assign client_name   = section.settings.client_name | default: 'Client Brand'
+  assign seller_entity = section.settings.seller_entity | default: 'Go-To Gifting LLC'
+  assign accent        = section.settings.accent_color
+  assign band          = section.settings.band_color
+  assign nav_color     = section.settings.nav_color
+  assign client_menu   = section.settings.client_menu
+-%}
+
+<style>
+  .cbh {
+    --cbh-accent: {{ accent }};
+    --cbh-band: {{ band }};
+    --cbh-nav: {{ nav_color }};
+    --cbh-foam: {{ section.settings.hero_bg | default: '#F7F4EC' }};
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+  }
+  .cbh-band {
+    background: var(--cbh-band); color: #fff; position: relative;
+    padding: 26px 20px 22px; text-align: center; overflow: hidden;
+  }
+  .cbh-band::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px;
+    background: repeating-linear-gradient(90deg, var(--cbh-accent) 0 22px, transparent 22px 44px);
+    opacity: .6;
+  }
+  .cbh-logo img { max-height: 60px; max-width: min(80vw, 320px); width: auto; display: block; margin: 0 auto; }
+  .cbh-wordmark {
+    font-family: 'Oswald', 'Helvetica Neue', sans-serif; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; color: #fff;
+    font-size: clamp(26px, 4.4vw, 44px); margin: 0; line-height: 1;
+  }
+  .cbh-est {
+    font-size: 11px; letter-spacing: .32em; color: var(--cbh-accent);
+    text-transform: uppercase; margin-top: 7px;
+  }
+  .cbh-band.is-light .cbh-est { color: #ffe6bf; }
+  .cbh-powered { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,.75); }
+  .cbh-powered strong { color: #fff; }
+  .cbh-nav {
+    background: var(--cbh-nav); color: #fff; text-align: center;
+    font-size: 12.5px; padding: 12px; letter-spacing: .03em;
+  }
+  .cbh-nav a { color: #fff; text-decoration: none; margin: 0 12px; text-transform: uppercase; }
+  .cbh-nav a:hover { color: var(--cbh-accent); }
+  .cbh-hero { background: var(--cbh-foam); padding: 40px 20px 26px; text-align: center; }
+  .cbh-ey {
+    color: {{ section.settings.eyebrow_color | default: '#2FA39B' }};
+    text-transform: uppercase; letter-spacing: .28em; font-size: 12px; font-weight: 700;
+  }
+  .cbh-h1 {
+    font-family: 'Oswald', 'Helvetica Neue', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; color: var(--cbh-band);
+    font-size: clamp(28px, 5vw, 46px); margin: 10px 0 6px;
+  }
+  .cbh-sub { max-width: 620px; margin: 0 auto; color: #4a5a62; line-height: 1.6; font-size: 15px; }
+</style>
+
+<div class="cbh">
+  <div class="cbh-band{% if section.settings.est_light %} is-light{% endif %}">
+    {%- if section.settings.client_logo != blank -%}
+      <span class="cbh-logo">{{ section.settings.client_logo | image_url: width: 360 | image_tag: alt: client_name }}</span>
+    {%- elsif section.settings.client_logo_asset != blank -%}
+      <span class="cbh-logo"><img src="{{ section.settings.client_logo_asset | asset_url }}" alt="{{ client_name | escape }}"></span>
+    {%- else -%}
+      <h2 class="cbh-wordmark">{{ client_name }}</h2>
+    {%- endif -%}
+    {%- if section.settings.est_line != blank -%}
+      <div class="cbh-est">{{ section.settings.est_line }}</div>
+    {%- endif -%}
+    <div class="cbh-powered">{{ section.settings.powered_prefix | default: 'Order Online &amp; Ship' }} — powered by <strong>{{ seller_entity }}</strong></div>
+  </div>
+
+  {%- if client_menu != blank -%}
+    <nav class="cbh-nav">
+      {%- for link in client_menu.links -%}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+  {%- endif -%}
+
+  {%- if section.settings.show_hero -%}
+    <div class="cbh-hero">
+      {%- if section.settings.eyebrow != blank -%}<div class="cbh-ey">{{ section.settings.eyebrow }}</div>{%- endif -%}
+      <h1 class="cbh-h1">{{ section.settings.heading | default: collection.title }}</h1>
+      {%- if section.settings.subtext != blank -%}<p class="cbh-sub">{{ section.settings.subtext }}</p>{%- endif -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Co-Brand Collection Header",
+  "settings": [
+    { "type": "header", "content": "Co-Branding" },
+    { "type": "text", "id": "client_name", "label": "Client brand name", "default": "Client Brand" },
+    { "type": "image_picker", "id": "client_logo", "label": "Client logo" },
+    { "type": "text", "id": "client_logo_asset", "label": "Client logo asset filename", "info": "Fallback: a file in the theme's assets folder." },
+    { "type": "text", "id": "seller_entity", "label": "Seller of record", "default": "Go-To Gifting LLC" },
+    { "type": "text", "id": "powered_prefix", "label": "Powered-by prefix", "default": "Order Online & Ship" },
+    { "type": "text", "id": "est_line", "label": "Established / tagline line", "info": "Small line under the logo. Leave blank to hide." },
+    { "type": "checkbox", "id": "est_light", "label": "Light-color est line (for dark bands)", "default": true },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "band_color", "label": "Header band color", "default": "#0E3A46" },
+    { "type": "color", "id": "accent_color", "label": "Accent color", "default": "#E7A130" },
+    { "type": "color", "id": "nav_color", "label": "Nav bar color", "default": "#0a2c35" },
+    { "type": "color", "id": "hero_bg", "label": "Hero background", "default": "#F7F4EC" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow color", "default": "#2FA39B" },
+    { "type": "header", "content": "Nav & Hero" },
+    { "type": "link_list", "id": "client_menu", "label": "Client navigation menu", "info": "Build a menu in Online Store → Navigation, then pick it here. Hidden if unset." },
+    { "type": "checkbox", "id": "show_hero", "label": "Show hero heading block", "default": true },
+    { "type": "text", "id": "eyebrow", "label": "Hero eyebrow", "default": "Fresh off the Coast" },
+    { "type": "text", "id": "heading", "label": "Hero heading", "info": "Defaults to the collection title if blank." },
+    { "type": "textarea", "id": "subtext", "label": "Hero subtext" }
+  ],
+  "presets": [{ "name": "Co-Brand Collection Header" }]
+}
+{% endschema %}
