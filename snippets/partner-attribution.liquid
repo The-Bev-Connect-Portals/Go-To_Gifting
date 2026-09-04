@@ -1,0 +1,134 @@
+{% comment %}
+  Partner attribution capture.
+
+  Reads click identifiers and partner/UTM parameters from the landing URL,
+  stores them first-touch, and writes them onto the Shopify cart as hidden
+  attributes so they survive into the completed order.
+
+  Why this lives in the theme and NOT in GTM:
+    - It must run before anything else can bounce the visitor away.
+    - GTM loads async and is blocked by ad blockers on a meaningful share of
+      traffic. Losing the click ID there loses the attribution entirely.
+    - The cart write is plumbing, not a marketing tag.
+
+  Attribute names are underscore-prefixed so they are hidden from the customer
+  in the cart and checkout while still recorded on the order.
+
+  Downstream: a Shopify Custom Pixel (Settings > Customer events) reads these
+  on checkout_completed and forwards the purchase event. GTM does NOT run in
+  checkout.
+{% endcomment %}
+<script>
+  (function () {
+    'use strict';
+
+    var KEYS = [
+      'partner',
+      'gclid', 'gbraid', 'wbraid', 'fbclid',
+      'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
+    ];
+
+    var STORE_KEY = 'gtg_attribution';
+    var TTL_DAYS  = 30;
+    var WROTE_KEY = 'gtg_attribution_written';
+
+    function now() { return Date.now(); }
+
+    function read() {
+      try {
+        var raw = localStorage.getItem(STORE_KEY);
+        if (!raw) return null;
+        var obj = JSON.parse(raw);
+        if (!obj || !obj.ts) return null;
+        if (now() - obj.ts > TTL_DAYS * 864e5) {
+          localStorage.removeItem(STORE_KEY);
+          return null;
+        }
+        return obj;
+      } catch (e) { return null; }
+    }
+
+    function write(obj) {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch (e) {}
+    }
+
+    // ---- 1. Capture from the URL, first touch wins -------------------------
+    function capture() {
+      var params, found = {}, any = false;
+      try { params = new URLSearchParams(location.search); } catch (e) { return read(); }
+
+      KEYS.forEach(function (k) {
+        var v = params.get(k);
+        if (v) { found[k] = v; any = true; }
+      });
+
+      if (!any) return read();
+
+      var existing = read();
+      if (existing && existing.data && existing.data.partner) {
+        // First touch already recorded. Do not overwrite.
+        return existing;
+      }
+
+      var record = { ts: now(), landing: location.pathname, data: found };
+      write(record);
+      return record;
+    }
+
+    // ---- 2. Write onto the cart as hidden attributes -----------------------
+    function toAttributes(record) {
+      var attrs = {};
+      Object.keys(record.data).forEach(function (k) {
+        attrs['_' + k] = record.data[k];
+      });
+      attrs['_attribution_ts'] = String(record.ts);
+      return attrs;
+    }
+
+    function writeToCart(record) {
+      if (!record || !record.data) return;
+      return fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attributes: toAttributes(record) })
+      })
+        .then(function () {
+          try { sessionStorage.setItem(WROTE_KEY, '1'); } catch (e) {}
+        })
+        .catch(function () { /* never break the page over attribution */ });
+    }
+
+    // ---- 3. Expose to the dataLayer for GTM -------------------------------
+    function pushToDataLayer(record) {
+      window.dataLayer = window.dataLayer || [];
+      var payload = { event: 'partner_attribution' };
+      KEYS.forEach(function (k) { payload[k] = (record && record.data[k]) || undefined; });
+      payload.attribution_ts = record ? record.ts : undefined;
+      window.dataLayer.push(payload);
+    }
+
+    // ---- 4. Run ------------------------------------------------------------
+    var record = capture();
+    if (!record) return;
+
+    pushToDataLayer(record);
+
+    var written;
+    try { written = sessionStorage.getItem(WROTE_KEY); } catch (e) { written = null; }
+    if (!written) writeToCart(record);
+
+    // Re-apply after any add-to-cart, since a fresh cart drops attributes.
+    if (window.fetch) {
+      var origFetch = window.fetch;
+      window.fetch = function () {
+        var url = arguments[0];
+        var href = typeof url === 'string' ? url : (url && url.url) || '';
+        var p = origFetch.apply(this, arguments);
+        if (href.indexOf('/cart/add') !== -1) {
+          p.then(function () { writeToCart(record); }).catch(function () {});
+        }
+        return p;
+      };
+    }
+  })();
+</script>
