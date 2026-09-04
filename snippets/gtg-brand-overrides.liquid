@@ -1,0 +1,54 @@
+{% doc %}
+  Go-To Gifting brand overrides.
+
+  Horizon 4.0.0 removed the per-scheme `foreground_heading` colour that Horizon
+  3.5.x exposed, so headings now inherit `settings.page_text_color`. This snippet
+  restores the brand's navy headings over the grey body copy.
+
+  Kept as a standalone snippet (rather than an edit to a core Horizon file) so
+  future Horizon updates apply cleanly without a merge conflict. Rendered from
+  layout/theme.liquid.
+{% enddoc %}
+
+{% liquid
+  assign heading_color = '#002850'
+  assign heading_on_dark = '#ffffff'
+{% endliquid %}
+
+<style>
+  /* Navy headings on light surfaces — matches Horizon 3.5.x scheme-1/2/4 */
+  .shopify-section h1,
+  .shopify-section h2,
+  .shopify-section h3,
+  .shopify-section h4,
+  .shopify-section .h1,
+  .shopify-section .h2,
+  .shopify-section .h3,
+  .shopify-section .h4 {
+    color: {{ heading_color }};
+  }
+
+  /*
+    On sections carrying a dark custom background, Horizon's contrast-override
+    system flips body text to the light palette extreme. Follow it for headings
+    so navy-on-navy never happens.
+  */
+  .color-custom[style*='--color-foreground: 255'] h1,
+  .color-custom[style*='--color-foreground: 255'] h2,
+  .color-custom[style*='--color-foreground: 255'] h3,
+  .color-custom[style*='--color-foreground: 255'] h4 {
+    color: {{ heading_on_dark }};
+  }
+
+  /* Header and footer groups manage their own contrast — don't fight them. */
+  .header-group h1,
+  .header-group h2,
+  .header-group h3,
+  .header-group h4,
+  .footer-group h1,
+  .footer-group h2,
+  .footer-group h3,
+  .footer-group h4 {
+    color: inherit;
+  }
+</style>
