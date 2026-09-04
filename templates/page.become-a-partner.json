@@ -14,7 +14,7 @@
           "type": "step",
           "settings": {
             "title": "We build your page",
-            "text": "A co-branded product page in your look and feel \u2014 your logo, your colors \u2014 \u201cpowered by Go-To Gifting,\u201d live on our licensed store."
+            "text": "A co-branded product page in your look and feel — your logo, your colors — “powered by Go-To Gifting,” live on our licensed store."
           }
         },
         "s3": {
@@ -28,42 +28,42 @@
           "type": "step",
           "settings": {
             "title": "You earn on every order",
-            "text": "Orders are tagged to your brand, picked and packed at our alcohol-ready warehouse, and shipped to 42+ states. You collect an affiliate commission \u2014 no licenses, no logistics."
+            "text": "Orders are tagged to your brand, picked and packed at our alcohol-ready warehouse, and shipped to 42+ states. You collect an affiliate commission — no licenses, no logistics."
           }
         },
         "p1": {
           "type": "perk",
           "settings": {
-            "title": "Sell what you legally can\u2019t",
-            "text": "Wine, champagne, and spirits pairings for your products \u2014 sold under our license, not yours. The gap between \u201cwine not included\u201d and \u201cwine included\u201d becomes your upside."
+            "title": "Sell what you legally can’t",
+            "text": "Wine, champagne, and spirits pairings for your products — sold under our license, not yours. The gap between “wine not included” and “wine included” becomes your upside."
           }
         },
         "p2": {
           "type": "perk",
           "settings": {
             "title": "Your brand stays front and center",
-            "text": "Customers see your name, your logo, your aesthetic. The \u201cpowered by\u201d line keeps it honest; everything else looks and feels like you."
+            "text": "Customers see your name, your logo, your aesthetic. The “powered by” line keeps it honest; everything else looks and feels like you."
           }
         },
         "p3": {
           "type": "perk",
           "settings": {
             "title": "Compliance built in",
-            "text": "21+ age gates, ID and adult-signature delivery, destination-state rules \u2014 enforced at the right layer, reviewed against our licensing. You never touch it."
+            "text": "21+ age gates, ID and adult-signature delivery, destination-state rules — enforced at the right layer, reviewed against our licensing. You never touch it."
           }
         },
         "p4": {
           "type": "perk",
           "settings": {
             "title": "Real fulfillment muscle",
-            "text": "Backed by our alcohol-ready 3PL in Ventura, CA \u2014 the same operation behind The BroBasket (since 2014) and The Bounty Basket Co. Learn more at thebevconnect.com."
+            "text": "Backed by our alcohol-ready 3PL in Ventura, CA — the same operation behind The BroBasket (since 2014) and The Bounty Basket Co. Learn more at thebevconnect.com."
           }
         },
         "p5": {
           "type": "perk",
           "settings": {
             "title": "Clean commission reporting",
-            "text": "Every order line is tagged to your brand, so payouts are transparent and reconcilable \u2014 no guesswork."
+            "text": "Every order line is tagged to your brand, so payouts are transparent and reconcilable — no guesswork."
           }
         },
         "p6": {
@@ -89,16 +89,16 @@
       "settings": {
         "eyebrow": "For Brands",
         "heading": "Become powered by Go-To Gifting",
-        "subheading": "Your brand, our license. Sell wine and spirits gifts without holding a single permit \u2014 we capture the sale as the licensed seller of record, fulfill compliantly, and pay you a commission on every order.",
+        "subheading": "Your brand, our license. Sell wine and spirits gifts without holding a single permit — we capture the sale as the licensed seller of record, fulfill compliantly, and pay you a commission on every order.",
         "cta_label": "Book a discovery call",
         "cta_link": "https://calendly.com/jamesgrasty/15min",
         "cta_external": true,
         "cta2_label": "Email us",
         "cta2_link": "mailto:info@go-togifting.com",
-        "steps_heading": "From \u201cwe can\u2019t sell alcohol\u201d to live in weeks",
+        "steps_heading": "From “we can’t sell alcohol” to live in weeks",
         "perks_heading": "What you get",
-        "final_heading": "Let\u2019s get your brand selling",
-        "final_text": "Tell us about your brand and your products, and we\u2019ll map the right path on a 15-minute call.",
+        "final_heading": "Let’s get your brand selling",
+        "final_text": "Tell us about your brand and your products, and we’ll map the right path on a 15-minute call.",
         "fineprint": "Go-To Gifting LLC is the seller of record on all orders. Partner brands act as marketing affiliates and are not parties to the sale. Alcohol available only in eligible states; 21+ with ID and adult signature required at delivery."
       }
     }

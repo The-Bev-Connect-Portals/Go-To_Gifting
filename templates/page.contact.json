@@ -26,7 +26,6 @@
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
-            "color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -52,7 +51,6 @@
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
-            "color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -71,7 +69,6 @@
       "settings": {
         "content_direction": "column",
         "gap": 32,
-        "color_scheme": "",
         "padding-block-start": 40,
         "padding-block-end": 0
       }
@@ -86,8 +83,6 @@
             "custom_width": 50,
             "width_mobile": "custom",
             "custom_width_mobile": 100,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
@@ -127,7 +122,6 @@
         "section_width": "page-width",
         "section_height": "",
         "section_height_custom": 50,
-        "color_scheme": "scheme-1",
         "background_media": "none",
         "video_position": "cover",
         "background_image_position": "cover",

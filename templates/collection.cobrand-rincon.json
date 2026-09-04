@@ -17,7 +17,7 @@
         "client_logo_asset": "",
         "seller_entity": "Go-To Gifting LLC",
         "powered_prefix": "Order Online & Ship",
-        "est_line": "Waves of Grain \u00b7 Est. 2014 \u00b7 Central Coast, CA",
+        "est_line": "Waves of Grain · Est. 2014 · Central Coast, CA",
         "est_light": true,
         "band_color": "#0E3A46",
         "accent_color": "#E7A130",
@@ -27,7 +27,7 @@
         "show_hero": true,
         "eyebrow": "Fresh off the Coast",
         "heading": "The Lineup",
-        "subtext": "Rincon Brewery's coastal beers \u2014 cold-packed and shipped to your door. Order online, we handle the rest."
+        "subtext": "Rincon Brewery's coastal beers — cold-packed and shipped to your door. Order online, we handle the rest."
       }
     },
     "main": {
@@ -45,8 +45,6 @@
             "show_filter_label": false,
             "enable_sorting": true,
             "enable_grid_density": true,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
             "padding-block-start": 8,
             "padding-block-end": 8,
             "padding-inline-start": 0,
@@ -61,8 +59,6 @@
           "static": true,
           "settings": {
             "product_card_gap": 4,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
@@ -102,7 +98,6 @@
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
-                "color": "var(--color-foreground)",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -127,7 +122,6 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
-                "color": "var(--color-foreground)",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -155,7 +149,6 @@
         "columns_gap_vertical": 24,
         "padding-inline-start": 0,
         "padding-inline-end": 0,
-        "color_scheme": "scheme-1",
         "padding-block-start": 0,
         "padding-block-end": 32
       }
