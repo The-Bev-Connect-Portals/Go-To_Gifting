@@ -1,3 +1,5 @@
+{%- comment -%}Brand name override (2026-10-07): store name can't be changed in admin yet, so the theme uses settings.brand_name.{%- endcomment -%}
+{%- assign brand_name = settings.brand_name | default: shop.name -%}
 {% liquid
   assign order = 'logo,menu,localization,search,drawer_search,actions'
 
@@ -327,7 +329,7 @@
   {
     "@context": "http://schema.org",
     "@type": "Organization",
-    "name": {{ shop.name | json }},
+    "name": {{ brand_name | json }},
     {% if settings.logo %}
       "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
     {% endif %}
@@ -382,7 +384,7 @@
     class="header__underlay header__underlay-open"
   ></div>
   {%- if request.page_type == 'index' -%}
-    <h1 class="visually-hidden">{{ shop.name }}</h1>
+    <h1 class="visually-hidden">{{ brand_name }}</h1>
   {%- endif -%}
   {% for row in rows %}
     {% liquid

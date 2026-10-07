@@ -1,3 +1,5 @@
+{%- comment -%}Brand name override (2026-10-07): store name can't be changed in admin yet, so the theme uses settings.brand_name.{%- endcomment -%}
+{%- assign brand_name = settings.brand_name | default: shop.name -%}
 {% assign block_settings = block.settings %}
 <div
   class="
@@ -13,7 +15,7 @@
 >
   <span class="footer-utilities__text">
     &copy; {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url -}}
+    {{ brand_name | link_to: routes.root_url -}}
     {%- if block_settings.show_powered_by -%}
       , {{ powered_by_link }}
     {%- endif -%}
