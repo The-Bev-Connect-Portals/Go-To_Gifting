@@ -1,0 +1,70 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+CONSENT GATE  (added 2026-10-12, CIPA risk reduction)
+----------------------------------------------------------------------------------------------------------------------
+Scripts hardcoded in the theme do NOT obey Shopify's cookie banner on their own (only app web pixels do).
+Wrap any tracking script in:
+
+    window.consentGate.run('analytics', function () { ...load script... });
+    window.consentGate.run('marketing', function () { ...load script... });
+
+- analytics  -> runs when Shopify.customerPrivacy.analyticsProcessingAllowed()
+- marketing  -> runs when marketingAllowed() AND saleOfDataAllowed() (honors CCPA opt-out and Global Privacy Control)
+
+Where no banner is required, Shopify reports consent as allowed and scripts load immediately, exactly as before.
+Where the banner shows (California, per Settings → Customer privacy), scripts wait until the visitor accepts.
+If the visitor accepts later on the same page, queued scripts run then (visitorConsentCollected event).
+Fails CLOSED: if Shopify's consent API can't load, nothing gated runs.
+----------------------------------------------------------------------------------------------------------------------
+{%- endcomment -%}
+<script>
+  (function (w, d) {
+    if (w.consentGate) return;
+    var queue = [];
+    var ready = false;
+
+    function allowed(cat) {
+      var cp = w.Shopify && w.Shopify.customerPrivacy;
+      if (!cp) return false;
+      try {
+        if (cat === 'analytics') return !!cp.analyticsProcessingAllowed();
+        if (cat === 'marketing') return !!cp.marketingAllowed() && !!cp.saleOfDataAllowed();
+        if (cat === 'preferences') return !!cp.preferencesProcessingAllowed();
+      } catch (e) {}
+      return false;
+    }
+
+    function flush() {
+      if (!ready) return;
+      queue = queue.filter(function (job) {
+        var ok = job.cats.every(allowed);
+        if (ok) { try { job.fn(); } catch (e) { if (w.console) console.error('[consentGate]', e); } }
+        return !ok;
+      });
+    }
+
+    w.consentGate = {
+      run: function (cats, fn) {
+        queue.push({ cats: [].concat(cats), fn: fn });
+        flush();
+      },
+      allowed: allowed
+    };
+
+    d.addEventListener('visitorConsentCollected', function () { flush(); });
+
+    var tries = 0;
+    function init() {
+      if (!w.Shopify || typeof w.Shopify.loadFeatures !== 'function') {
+        if (++tries > 200) return;  // ~10s; fail closed
+        return setTimeout(init, 50);
+      }
+      w.Shopify.loadFeatures([{ name: 'consent-tracking-api', version: '0.1' }], function (err) {
+        if (err) return;  // fail closed
+        ready = true;
+        flush();
+      });
+    }
+    init();
+  })(window, document);
+</script>
